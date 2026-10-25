@@ -53,6 +53,20 @@ Use this skill when verified buyer, workflow, offer, proof, and CTA details need
 | Use verified facts from other skills as context. | Invent client proof, recipient authority, metrics, legal claims, or regulated-use assurances. |
 | Keep messages review-ready and scoped. | Approve external sending or bypass recipient/routing verification. |
 
+## Approval Check Before External Send
+
+Drafts stay drafts: rendering email copy does not authorize sending it. Any external send needs explicit recipient/send approval. In an orchestrated engagement, record it in `project_state.approvals.external_send` (the `recipient_or_external_send` gate), with `status: approved`, `approved_by`, and an ISO `approved_at` date.
+
+When `agentic-services-orchestrator-skill` is installed, run its validator against the engagement's current state before sending:
+
+```bash
+python3 /absolute/path/to/agentic-services-orchestrator-skill/scripts/validate_state.py /absolute/path/to/project_state.yaml --action external_send
+```
+
+Replace both paths with the installed orchestrator and actual state file; this email skill does not include `scripts/validate_state.py`. Require a zero exit status and resolve every reported violation before proceeding. This is a deterministic, read-only check, not a runtime guard: it neither sends email nor grants permission to send. The authorized sender must still verify the actual recipients, routing, message and attachments, and current approval.
+
+Without the orchestrator, this skill remains independently usable for local drafting and rendering. Verify the same explicit recipient/send approval before any external delivery through a separately authorized tool; missing tooling or approval is not permission to send.
+
 ## Core Workflow
 
 | Step | Action |
